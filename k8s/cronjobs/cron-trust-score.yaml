@@ -18,5 +18,5 @@ spec:
           containers:
           - name: trust-score
             image: ppankajs/self-healing-app:latest
-            command: ["python", "scripts/trust_score.py"]
+            command: ["python", "/app/scripts/trust_score.py"]
           restartPolicy: OnFailure

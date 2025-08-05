@@ -18,5 +18,5 @@ spec:
           containers:
           - name: health-score
             image: ppankajs/self-healing-app:latest
-            command: ["python", "scripts/health_scoring.py"]
+            command: ["python", "/app/scripts/health_scoring.py"]
           restartPolicy: OnFailure
