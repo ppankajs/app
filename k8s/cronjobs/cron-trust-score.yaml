@@ -10,6 +10,6 @@ spec:
         spec:
           containers:
           - name: trust-score
-            image: your-image-name
+            image: ppankajs/self-healing-app:latest
             command: ["python", "scripts/trust_score.py"]
           restartPolicy: OnFailure

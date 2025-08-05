@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: flask-container
-        image: your-dockerhub-username/self-healing-app:latest
+        image: ppankajs/self-healing-app:latest
         ports:
         - containerPort: 5000
         livenessProbe:

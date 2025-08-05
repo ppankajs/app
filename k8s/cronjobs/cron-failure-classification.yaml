@@ -10,6 +10,6 @@ spec:
         spec:
           containers:
           - name: failure-check
-            image: your-image-name
+            image: ppankajs/self-healing-app:latest
             command: ["python", "scripts/failure_classification.py"]
           restartPolicy: OnFailure
