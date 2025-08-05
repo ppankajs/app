@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flask-app
+  labels:
+    app: self-healing
+    owner: prasanna
 spec:
   replicas: 2
   selector:
@@ -10,8 +13,8 @@ spec:
   template:
     metadata:
       labels:
-        app: flask
-        owner: self-healing
+        app: self_healing
+        owner: prasanna
     spec:
       containers:
       - name: flask-container

@@ -2,6 +2,9 @@ apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRequiredProbes
 metadata:
   name: must-have-probes
+  labels:
+    app: self-healing
+    owner: prasanna
 spec:
   match:
     kinds:

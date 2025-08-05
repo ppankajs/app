@@ -2,11 +2,18 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: explainable-rollback
+  labels:
+    app: self-healing
+    owner: prasanna
 spec:
   schedule: "*/15 * * * *"
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            app: self-healing
+            owner: prasanna
         spec:
           containers:
           - name: rollback

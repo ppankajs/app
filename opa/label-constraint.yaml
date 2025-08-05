@@ -2,8 +2,13 @@ apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRequiredLabels
 metadata:
   name: must-have-labels
+  labels:
+    app: self-healing
+    owner: prasanna
 spec:
   match:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+  parameters:
+    labels: ["app", "owner"]

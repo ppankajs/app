@@ -5,6 +5,8 @@ metadata:
   name: db
   labels:
     app: postgres
+    self-healing: "true"
+    owner: prasanna
 spec:
   selector:
     app: postgres
@@ -21,6 +23,8 @@ metadata:
   name: postgres
   labels:
     app: postgres
+    self-healing: "true"
+    owner: prasanna
 spec:
   replicas: 1
   selector:
@@ -30,6 +34,8 @@ spec:
     metadata:
       labels:
         app: postgres
+        self-healing: "true"
+        owner: prasanna
     spec:
       containers:
         - name: postgres
