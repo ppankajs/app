@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: failure-classification
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: failure-check
+            image: your-image-name
+            command: ["python", "scripts/failure_classification.py"]
+          restartPolicy: OnFailure

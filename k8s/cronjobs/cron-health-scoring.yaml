@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: health-scoring
+spec:
+  schedule: "*/3 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: health-score
+            image: your-image-name
+            command: ["python", "scripts/health_scoring.py"]
+          restartPolicy: OnFailure

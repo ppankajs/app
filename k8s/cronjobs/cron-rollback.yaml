@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: explainable-rollback
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: rollback
+            image: your-image-name
+            command: ["python", "scripts/explainable_rollback.py"]
+          restartPolicy: OnFailure

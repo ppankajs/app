@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: trust-score-check
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: trust-score
+            image: your-image-name
+            command: ["python", "scripts/trust_score.py"]
+          restartPolicy: OnFailure
