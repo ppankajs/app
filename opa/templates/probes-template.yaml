@@ -7,9 +7,6 @@ spec:
     spec:
       names:
         kind: K8sRequiredProbes
-        listKind: K8sRequiredProbesList
-        plural: k8srequiredprobes
-        singular: k8srequiredprobes
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
