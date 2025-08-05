@@ -17,6 +17,6 @@ spec:
         spec:
           containers:
           - name: rollback
-            image: ppankajs/self-healing-app:latest
+            image: ppankajs/self-healing-app::v35
             command: ["python", "/app/scripts/explainable_rollback.py"]
           restartPolicy: OnFailure
