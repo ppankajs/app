@@ -12,7 +12,7 @@ def get_db_connection():
         # host="localhost",
         database="self_healing",
         user="postgres",
-        password="Prasanna@31"
+        password="postgres"
     )
     return conn
 
@@ -22,12 +22,16 @@ def home():
 
 @app.route('/health')
 def health():
+    return "OK", 200
+
+@app.route('/db-health')
+def db_health():
     try:
         conn = get_db_connection()
         conn.close()
-        return "UP", 200
-    except:
-        return "DB DOWN", 500
+        return "DB UP", 200
+    except Exception as e:
+        return jsonify({"status": "DB DOWN", "error": str(e)}), 500
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_user():
