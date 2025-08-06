@@ -51,12 +51,12 @@ pipeline {
       steps {
         sh 'kubectl apply -f k8s/prometheus-additional-scrape-config.yaml'
 
-        sh '''
-          helm upgrade prometheus prometheus-community/prometheus \
-            --namespace monitoring \
-            --set server.extraScrapeConfigsMount.enabled=true \
-            --set-file server.extraScrapeConfigs=k8s/prometheus-additional-scrape-config.yaml
-        '''
+        // sh '''
+        //   helm upgrade prometheus prometheus-community/prometheus \
+        //     --namespace monitoring \
+        //     --set server.extraScrapeConfigsMount.enabled=true \
+        //     --set-file server.extraScrapeConfigs=k8s/prometheus-additional-scrape-config.yaml
+        // '''
       }
     }
     stage('Deploy CronJobs (Self-Healing)') {
@@ -88,11 +88,11 @@ pipeline {
       kubectl apply -f opa/templates/label-template.yaml
       kubectl apply -f opa/templates/probes-template.yaml
 
-      echo "⏳ Waiting for CRD 'k8srequiredprobes.constraints.gatekeeper.sh' to be registered and usable..."
+      echo "Waiting for CRD 'k8srequiredprobes.constraints.gatekeeper.sh' to be registered and usable..."
 
       # Wait loop for CRD to become available
       for i in {1..12}; do
-        echo "⏱️ Attempt $i: Checking if CRD exists and is ready..."
+        echo "Attempt $i: Checking if CRD exists and is ready..."
         kubectl get crd k8srequiredprobes.constraints.gatekeeper.sh >/dev/null 2>&1 && break
         sleep 5
       done

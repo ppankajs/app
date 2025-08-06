@@ -9,12 +9,12 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app: self_healing
+      app: self-healing
       owner: prasanna
   template:
     metadata:
       labels:
-        app: self_healing
+        app: self-healing
         owner: prasanna
     spec:
       containers:
