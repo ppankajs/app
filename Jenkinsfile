@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     IMAGE_NAME = "self-healing-app"
-    DOCKER_REGISTRY = "your-dockerhub-username"
+    DOCKER_REGISTRY = "ppankajs"
     TAG = "v${BUILD_NUMBER}"
   }
 
@@ -11,7 +11,7 @@ pipeline {
 
     stage('Clone Repo') {
       steps {
-        git 'https://github.com/yourusername/self_healing_flask_pipeline_bundle.git'
+        git credentialsId: 'github-credentials', url: 'https://github.com/ppankajs/app.git'
       }
     }
 
@@ -26,7 +26,7 @@ pipeline {
     stage('Push Docker Image') {
       steps {
         script {
-          docker.withRegistry('', 'dockerhub-credentials-id') {
+          docker.withRegistry('', 'docker-credentials') {
             docker.image("${DOCKER_REGISTRY}/${IMAGE_NAME}:${TAG}").push()
           }
         }
@@ -43,11 +43,22 @@ pipeline {
       steps {
         // Replace image tag in deployment file before applying
         sh """
-          sed 's|your-dockerhub-username/self-healing-app:latest|${DOCKER_REGISTRY}/${IMAGE_NAME}:${TAG}|' k8s/app-deployment.yaml | kubectl apply -f -
+          sed 's|ppankajs/self-healing-app:latest|${DOCKER_REGISTRY}/${IMAGE_NAME}:${TAG}|' k8s/deployment.yaml | kubectl apply -f -
         """
       }
     }
+    stage('Configure Prometheus for Flask App') {
+      steps {
+        sh 'kubectl apply -f k8s/prometheus-additional-scrape-config.yaml'
 
+        sh '''
+          helm upgrade prometheus prometheus-community/prometheus \
+            --namespace monitoring \
+            --set server.extraScrapeConfigsMount.enabled=true \
+            --set-file server.extraScrapeConfigs=k8s/prometheus-additional-scrape-config.yaml
+        '''
+      }
+    }
     stage('Deploy CronJobs (Self-Healing)') {
       steps {
         script {
@@ -60,7 +71,7 @@ pipeline {
 
           for (cron in cronJobs) {
             sh """
-              sed 's|your-image-name|${DOCKER_REGISTRY}/${IMAGE_NAME}:${TAG}|' k8s/cronjobs/${cron} | kubectl apply -f -
+              sed 's|ppankajs/self-healing-app:latest|${DOCKER_REGISTRY}/${IMAGE_NAME}:${TAG}|' k8s/cronjobs/${cron} | kubectl apply -f -
             """
           }
         }
@@ -68,13 +79,34 @@ pipeline {
     }
 
     stage('OPA: Apply Constraint Templates') {
-      steps {
-        sh '''
-          kubectl apply -f opa/templates/label-template.yaml
-          kubectl apply -f opa/templates/probes-template.yaml
-        '''
-      }
-    }
+  steps {
+    sh '''
+      # Delete template if exists
+      kubectl delete constrainttemplate k8srequiredprobes --ignore-not-found
+
+      # Apply templates
+      kubectl apply -f opa/templates/label-template.yaml
+      kubectl apply -f opa/templates/probes-template.yaml
+
+      echo "⏳ Waiting for CRD 'k8srequiredprobes.constraints.gatekeeper.sh' to be registered and usable..."
+
+      # Wait loop for CRD to become available
+      for i in {1..12}; do
+        echo "⏱️ Attempt $i: Checking if CRD exists and is ready..."
+        kubectl get crd k8srequiredprobes.constraints.gatekeeper.sh >/dev/null 2>&1 && break
+        sleep 5
+      done
+
+      # Final confirmation (with fail-safe)
+      if ! kubectl get crd k8srequiredprobes.constraints.gatekeeper.sh >/dev/null 2>&1; then
+        echo "CRD k8srequiredprobes.constraints.gatekeeper.sh' not found after waiting. Aborting."
+        exit 1
+      fi
+
+      echo "CRD is ready!"
+    '''
+  }
+}
 
     stage('OPA: Apply Constraints') {
       steps {

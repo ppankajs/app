@@ -2,8 +2,10 @@ from flask import Flask, request, jsonify
 import psycopg2
 import socket
 from retry import retry
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
+metrics = PrometheusMetrics(app)
 
 @retry(psycopg2.OperationalError, tries=3, delay=2)
 def get_db_connection():

@@ -1,18 +1,24 @@
-import requests
-import logging
+import subprocess
+import json
+import time
 
-logging.basicConfig(level=logging.INFO)
+def classify_failures():
+    print("[INFO] Starting Failure Classification...")
+    result = subprocess.run(
+        ["kubectl", "get", "pods", "-o", "json"],
+        capture_output=True, text=True
+    )
+    pods = json.loads(result.stdout)
 
-def check_failure():
-    try:
-        response = requests.get("http://flask-service:5000/health", timeout=5)
-        if response.status_code == 200:
-            logging.info("Flask service is healthy.")
-        else:
-            logging.warning(f"Flask health check returned {response.status_code}.")
-    except Exception as e:
-        logging.error(f"Service failure detected: {e}")
-        # Optionally: notify or write to a failure DB
+    for pod in pods['items']:
+        name = pod['metadata']['name']
+        phase = pod['status'].get('phase', '')
+        state = pod['status'].get('containerStatuses', [{}])[0].get('state', {})
+
+        if phase == "Failed" or "terminated" in state:
+            reason = state.get('terminated', {}).get('reason', 'Unknown')
+            print(f"[FAILURE] Pod: {name}, Reason: {reason}")
+            print("[CLASSIFICATION] Type: ApplicationFailure")
 
 if __name__ == "__main__":
-    check_failure()
+    classify_failures()
