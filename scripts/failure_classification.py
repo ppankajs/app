@@ -15,7 +15,8 @@ def classify_failures():
         phase = pod['status'].get('phase', '')
         state = pod['status'].get('containerStatuses', [{}])[0].get('state', {})
 
-        if phase == "Failed" or "terminated" in state:
+        # if phase == "Failed" or "terminated" in state:
+        if phase in ["Failed", "Unknown"] or "terminated" in state or "waiting" in state:
             reason = state.get('terminated', {}).get('reason', 'Unknown')
             print(f"[FAILURE] Pod: {name}, Reason: {reason}")
             print("[CLASSIFICATION] Type: ApplicationFailure")
