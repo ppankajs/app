@@ -55,9 +55,9 @@ spec:
           livenessProbe:
             exec:
               command:
-                - pg_isready
-                - -U
-                - postgres
+                - /bin/sh
+                - -c
+                - pg_isready -U postgres
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 2
@@ -65,9 +65,9 @@ spec:
           readinessProbe:
             exec:
               command:
-                - pg_isready
-                - -U
-                - postgres
+                - /bin/sh
+                - -c
+                - pg_isready -U postgres
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 2
