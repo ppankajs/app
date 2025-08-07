@@ -42,6 +42,7 @@ import json
 def classify_failures():
     print("[INFO] Starting Failure Classification...")
 
+    # Get pod data from all namespaces in JSON
     result = subprocess.run(
         ["kubectl", "get", "pods", "-A", "-o", "json"],
         capture_output=True, text=True
@@ -49,7 +50,7 @@ def classify_failures():
 
     try:
         pods = json.loads(result.stdout)
-    except json.JSONDecodeError as e:
+    except json.JSONDecodeError:
         print("[ERROR] Failed to parse kubectl output.")
         return
 
@@ -64,19 +65,19 @@ def classify_failures():
             container_name = container.get("name")
             restart_count = container.get("restartCount", 0)
             state = container.get("state", {})
-            waiting = state.get("waiting", {})
-            reason_waiting = waiting.get("reason", "")
-            last_state = container.get("lastState", {})
-            terminated_reason = last_state.get("terminated", {}).get("reason", "")
+            waiting_reason = state.get("waiting", {}).get("reason", "")
+            terminated_reason = container.get("lastState", {}).get("terminated", {}).get("reason", "")
 
-            print(f"[DEBUG] Checking Pod: {pod_name}, Container: {container_name}, RestartCount: {restart_count}, WaitingReason: {reason_waiting}, TerminatedReason: {terminated_reason}")
-
-            if reason_waiting == "CrashLoopBackOff" or terminated_reason == "Error" or restart_count >= 3:
+            if (
+                waiting_reason == "CrashLoopBackOff" or
+                terminated_reason == "Error" or
+                restart_count >= 3
+            ):
                 print(f"[FAILURE] Pod: {pod_name} (ns: {namespace})")
                 print(f"  Container: {container_name}")
                 print(f"  Restart Count: {restart_count}")
-                print(f"  Waiting Reason: {reason_waiting}")
-                print(f"  Terminated Reason: {terminated_reason}")
+                print(f"  Waiting Reason: {waiting_reason}")
+                print(f"  Last Terminated Reason: {terminated_reason}")
                 print("[CLASSIFICATION] Type: ApplicationFailure")
                 found_failure = True
 
