@@ -39,10 +39,9 @@
 import subprocess
 import json
 
-def classify_failures():
+def classify_crashloopbackoff():
     print("[INFO] Starting Failure Classification...")
 
-    # Get pod data from all namespaces in JSON
     result = subprocess.run(
         ["kubectl", "get", "pods", "-A", "-o", "json"],
         capture_output=True, text=True
@@ -54,7 +53,7 @@ def classify_failures():
         print("[ERROR] Failed to parse kubectl output.")
         return
 
-    found_failure = False
+    found_crash = False
 
     for pod in pods["items"]:
         pod_name = pod["metadata"]["name"]
@@ -63,26 +62,18 @@ def classify_failures():
 
         for container in container_statuses:
             container_name = container.get("name")
-            restart_count = container.get("restartCount", 0)
             state = container.get("state", {})
             waiting_reason = state.get("waiting", {}).get("reason", "")
-            terminated_reason = container.get("lastState", {}).get("terminated", {}).get("reason", "")
 
-            if (
-                waiting_reason == "CrashLoopBackOff" or
-                terminated_reason == "Error" or
-                restart_count >= 3
-            ):
+            if waiting_reason == "CrashLoopBackOff":
                 print(f"[FAILURE] Pod: {pod_name} (ns: {namespace})")
                 print(f"  Container: {container_name}")
-                print(f"  Restart Count: {restart_count}")
                 print(f"  Waiting Reason: {waiting_reason}")
-                print(f"  Last Terminated Reason: {terminated_reason}")
-                print("[CLASSIFICATION] Type: ApplicationFailure")
-                found_failure = True
+                print("[CLASSIFICATION] Type: CrashLoopBackOff")
+                found_crash = True
 
-    if not found_failure:
-        print("[INFO] No failures detected.")
+    if not found_crash:
+        print("[INFO] No CrashLoopBackOff detected.")
 
 if __name__ == "__main__":
-    classify_failures()
+    classify_crashloopbackoff()
