@@ -43,7 +43,7 @@ def classify_failures():
     print("[INFO] Starting Failure Classification...")
 
     result = subprocess.run(
-        ["kubectl", "get", "pods", "--all-namespaces", "-o", "json"],
+        ["kubectl", "get", "pods", "-A", "-o", "json"],
         capture_output=True, text=True
     )
 
@@ -63,12 +63,11 @@ def classify_failures():
 
         for container in container_statuses:
             container_name = container.get("name", "unknown")
-            state = container.get("state", {})
-            last_state = container.get("lastState", {})
             restart_count = container.get("restartCount", 0)
 
-            # Check failure conditions
+            state = container.get("state", {})
             waiting = state.get("waiting", {})
+            last_state = container.get("lastState", {})
             terminated = last_state.get("terminated", {})
 
             if (
@@ -79,8 +78,8 @@ def classify_failures():
                 print(f"[FAILURE] Pod: {name} (ns: {namespace})")
                 print(f"  Container: {container_name}")
                 print(f"  Restart Count: {restart_count}")
-                print(f"  Waiting Reason: {waiting.get('reason')}")
-                print(f"  Terminated Reason: {terminated.get('reason')}")
+                print(f"  Waiting Reason: {waiting.get('reason', 'N/A')}")
+                print(f"  Terminated Reason: {terminated.get('reason', 'N/A')}")
                 print("[CLASSIFICATION] Type: ApplicationFailure")
                 found_failure = True
 
