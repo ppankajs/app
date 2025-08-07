@@ -56,30 +56,22 @@ def classify_failures():
     found_failure = False
 
     for pod in pods["items"]:
-        name = pod["metadata"]["name"]
+        pod_name = pod["metadata"]["name"]
         namespace = pod["metadata"]["namespace"]
-        status = pod.get("status", {})
-        container_statuses = status.get("containerStatuses", [])
+        container_statuses = pod.get("status", {}).get("containerStatuses", [])
 
         for container in container_statuses:
-            container_name = container.get("name", "unknown")
+            container_name = container.get("name")
             restart_count = container.get("restartCount", 0)
-
             state = container.get("state", {})
             waiting = state.get("waiting", {})
-            last_state = container.get("lastState", {})
-            terminated = last_state.get("terminated", {})
+            reason = waiting.get("reason", "")
 
-            if (
-                waiting.get("reason") == "CrashLoopBackOff" or
-                terminated.get("reason") == "Error" or
-                restart_count >= 3
-            ):
-                print(f"[FAILURE] Pod: {name} (ns: {namespace})")
+            if reason == "CrashLoopBackOff" or restart_count >= 3:
+                print(f"[FAILURE] Pod: {pod_name} (ns: {namespace})")
                 print(f"  Container: {container_name}")
                 print(f"  Restart Count: {restart_count}")
-                print(f"  Waiting Reason: {waiting.get('reason', 'N/A')}")
-                print(f"  Terminated Reason: {terminated.get('reason', 'N/A')}")
+                print(f"  Waiting Reason: {reason}")
                 print("[CLASSIFICATION] Type: ApplicationFailure")
                 found_failure = True
 
