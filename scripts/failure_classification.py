@@ -47,34 +47,45 @@ def classify_failures():
         capture_output=True, text=True
     )
 
-    pods = json.loads(result.stdout)
+    try:
+        pods = json.loads(result.stdout)
+    except json.JSONDecodeError as e:
+        print("[ERROR] Failed to parse kubectl output.")
+        return
 
-    for pod in pods['items']:
-        name = pod['metadata']['name']
-        namespace = pod['metadata']['namespace']
-        phase = pod['status'].get('phase', '')
-        container_statuses = pod['status'].get('containerStatuses', [])
+    found_failure = False
 
-        for status in container_statuses:
-            state = status.get('state', {})
-            restart_count = status.get('restartCount', 0)
+    for pod in pods["items"]:
+        name = pod["metadata"]["name"]
+        namespace = pod["metadata"]["namespace"]
+        status = pod.get("status", {})
+        container_statuses = status.get("containerStatuses", [])
 
-            terminated = state.get('terminated')
-            waiting = state.get('waiting')
-            waiting_reason = waiting.get('reason') if waiting else None
-            terminated_reason = terminated.get('reason') if terminated else None
+        for container in container_statuses:
+            container_name = container.get("name", "unknown")
+            state = container.get("state", {})
+            last_state = container.get("lastState", {})
+            restart_count = container.get("restartCount", 0)
+
+            # Check failure conditions
+            waiting = state.get("waiting", {})
+            terminated = last_state.get("terminated", {})
 
             if (
-                phase in ["Failed", "Unknown"] or
-                terminated_reason is not None or
-                (waiting_reason and waiting_reason in ["CrashLoopBackOff", "Error"]) or
-                restart_count > 3  # Consider high restarts as failure
+                waiting.get("reason") == "CrashLoopBackOff" or
+                terminated.get("reason") == "Error" or
+                restart_count >= 3
             ):
                 print(f"[FAILURE] Pod: {name} (ns: {namespace})")
-                print(f"  Phase: {phase}")
-                print(f"  Reason: {waiting_reason or terminated_reason or 'Unknown'}")
-                print(f"  Restarts: {restart_count}")
+                print(f"  Container: {container_name}")
+                print(f"  Restart Count: {restart_count}")
+                print(f"  Waiting Reason: {waiting.get('reason')}")
+                print(f"  Terminated Reason: {terminated.get('reason')}")
                 print("[CLASSIFICATION] Type: ApplicationFailure")
+                found_failure = True
+
+    if not found_failure:
+        print("[INFO] No failures detected.")
 
 if __name__ == "__main__":
     classify_failures()
