@@ -5,6 +5,7 @@ metadata:
   labels:
     app: self-healing
     owner: prasanna
+    prometheus: enabled
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/path: "/metrics"
