@@ -56,14 +56,22 @@ spec:
             exec:
               command:
                 - pg_isready
+                - -U
+                - postgres
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 5
           readinessProbe:
             exec:
               command:
                 - pg_isready
+                - -U
+                - postgres
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
       volumes:
         - name: postgres-storage
           emptyDir: {}
