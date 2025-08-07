@@ -5,11 +5,6 @@ metadata:
   labels:
     app: self-healing
     owner: prasanna
-    prometheus: enabled
-  annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/path: "/metrics"
-    prometheus.io/port: "5000"
 spec:
   replicas: 2
   selector:
@@ -21,6 +16,11 @@ spec:
       labels:
         app: self-healing
         owner: prasanna
+        prometheus: enabled
+      annotations:
+        prometheus.io/scrape: "true"    
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "5000"
     spec:
       containers:
       - name: flask-container
