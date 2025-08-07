@@ -2,7 +2,7 @@ import subprocess
 import json
 import sys
 
-TRUSTED_TAGS = ["v35", "v36", "v37", "v38"]
+TRUSTED_TAGS = ["v78", "v77", "v76"]
 TRUST_THRESHOLD = 70
 
 def evaluate_trust():

@@ -2,7 +2,7 @@ import subprocess
 import json
 
 SCORE_THRESHOLD = 70
-ROLLBACK_TO_TAG = "v35"
+ROLLBACK_TO_TAG = "v78"
 
 def get_latest_scores():
     # Normally fetch real output from logs or monitoring systems
