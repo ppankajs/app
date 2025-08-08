@@ -4,7 +4,7 @@ import subprocess
 
 SCORE_THRESHOLD = 70
 DATA_DIR = "/data"
-ROLLBACK_TO_TAG = "v94"
+ROLLBACK_TO_TAG = "v95"
 
 def read_score(file_name):
     try:

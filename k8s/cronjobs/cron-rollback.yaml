@@ -16,7 +16,7 @@ spec:
           containers:
           - name: rollback
             image: ppankajs/self-healing-app:latest
-            command: ["python", "/app/scripts/rollback.py"]
+            command: ["python", "/app/scripts/explainable_rollback.py"]
             volumeMounts:
               - name: shared-data
                 mountPath: /data
