@@ -15,6 +15,7 @@ spec:
             app: self-healing
             owner: prasanna
         spec:
+          serviceAccountName: failure-classification-sa
           containers:
           - name: failure-check
             image: ppankajs/self-healing-app:latest
