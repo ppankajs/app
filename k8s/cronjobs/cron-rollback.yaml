@@ -7,6 +7,10 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            app: self-healing         
+            owner: prasanna
         spec:
           serviceAccountName: rollback-sa
           containers:
