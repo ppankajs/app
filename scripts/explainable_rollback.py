@@ -4,7 +4,7 @@ import subprocess
 
 SCORE_THRESHOLD = 70
 DATA_DIR = "/data"
-ROLLBACK_TO_TAG = "v95"
+ROLLBACK_TO_TAG = "v96"
 
 def read_score(file_name):
     try:
@@ -28,9 +28,9 @@ def trigger_rollback():
     print(f"[ROLLBACK] Deployment score too low. Rolling back to {ROLLBACK_TO_TAG}")
     subprocess.run([
         "kubectl", "set", "image", "deployment/flask-app",
-        f"flask-app=ppankajs/self-healing-app:{ROLLBACK_TO_TAG}"
+        f"flask-container=ppankajs/self-healing-app:{ROLLBACK_TO_TAG}"
     ])
-
+    
 def main():
     scores = get_latest_scores()
     avg_score = sum(scores.values()) // len(scores)
