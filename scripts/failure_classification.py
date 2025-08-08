@@ -18,7 +18,8 @@ def classify_crashloopbackoff():
             statuses = pod.get("status", {}).get("containerStatuses", [])
             for container in statuses:
                 waiting = container.get("state", {}).get("waiting", {})
-                if waiting.get("reason") == "CrashLoopBackOff":
+                # if waiting.get("reason") == "CrashLoopBackOff":
+                if waiting.get("reason") in ["CrashLoopBackOff", "ImagePullBackOff"]:
                     print(f"[FAILURE] CrashLoopBackOff in {pod['metadata']['name']}")
                     found_crash = True
     except json.JSONDecodeError:
