@@ -15,6 +15,7 @@ spec:
             app: self-healing
             owner: prasanna
         spec:
+        serviceAccountName: rollback-sa
           containers:
           - name: rollback
             image: ppankajs/self-healing-app:latest
