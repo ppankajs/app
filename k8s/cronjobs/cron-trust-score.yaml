@@ -2,22 +2,22 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: trust-score-check
-  labels:
-    app: self-healing
-    owner: prasanna
 spec:
   schedule: "*/10 * * * *"
   jobTemplate:
     spec:
       template:
-        metadata:
-          labels:
-            app: self-healing
-            owner: prasanna
         spec:
           serviceAccountName: trust-check-sa
           containers:
           - name: trust-score
             image: ppankajs/self-healing-app:latest
             command: ["python", "/app/scripts/trust_score.py"]
+            volumeMounts:
+              - name: shared-data
+                mountPath: /data
           restartPolicy: OnFailure
+          volumes:
+            - name: shared-data
+              persistentVolumeClaim:
+                claimName: score-storage

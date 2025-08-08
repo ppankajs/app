@@ -2,21 +2,21 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: health-scoring
-  labels:
-    app: self-healing
-    owner: prasanna
 spec:
   schedule: "*/3 * * * *"
   jobTemplate:
     spec:
       template:
-        metadata:
-          labels:
-            app: self-healing
-            owner: prasanna
         spec:
           containers:
           - name: health-score
             image: ppankajs/self-healing-app:latest
             command: ["python", "/app/scripts/health_scoring.py"]
+            volumeMounts:
+              - name: shared-data
+                mountPath: /data
           restartPolicy: OnFailure
+          volumes:
+            - name: shared-data
+              persistentVolumeClaim:
+                claimName: score-storage

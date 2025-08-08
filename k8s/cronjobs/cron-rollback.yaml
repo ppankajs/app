@@ -2,22 +2,22 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: explainable-rollback
-  labels:
-    app: self-healing
-    owner: prasanna
 spec:
   schedule: "*/15 * * * *"
   jobTemplate:
     spec:
       template:
-        metadata:
-          labels:
-            app: self-healing
-            owner: prasanna
         spec:
           serviceAccountName: rollback-sa
           containers:
           - name: rollback
             image: ppankajs/self-healing-app:latest
-            command: ["python", "/app/scripts/explainable_rollback.py"]
+            command: ["python", "/app/scripts/rollback.py"]
+            volumeMounts:
+              - name: shared-data
+                mountPath: /data
           restartPolicy: OnFailure
+          volumes:
+            - name: shared-data
+              persistentVolumeClaim:
+                claimName: score-storage
