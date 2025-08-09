@@ -2,6 +2,9 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: failure-classification
+  labels:
+    app: self-healing
+    owner: prasanna
 spec:
   schedule: "*/5 * * * *"
   jobTemplate:
