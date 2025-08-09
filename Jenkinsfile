@@ -61,7 +61,6 @@ pipeline {
 	      sh 'kubectl apply -f k8s/failure-sa.yaml'
 	      sh 'kubectl apply -f k8s/rollback-access.yaml'
 	      sh 'kubectl apply -f k8s/rollback-access.yaml'
-	      sh 'kubectl apply -f k8s/pvc.yaml'
         }
     }
 
