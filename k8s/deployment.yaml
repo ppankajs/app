@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: flask-container
-        image: ppankajs/self-healing-app:v99999
+        image: ppankajs/self-healing-app:latest
         ports:
         - containerPort: 5000
         livenessProbe:
