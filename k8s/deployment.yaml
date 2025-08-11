@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       app: self-healing
-      # owner: prasanna
+      owner: prasanna
   template:
     metadata:
       labels:
@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: flask-container
-        image: ppankajs/self-healing-app:latest
+        image: ppankajs/self-healing-app:v9999
         ports:
         - containerPort: 5000
         livenessProbe:
