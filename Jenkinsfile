@@ -87,7 +87,7 @@ pipeline {
       steps {
         sh '''
           # Delete template if exists
-          kubectl delete constrainttemplate k8srequiredprobes --ignore-not-found
+          #kubectl delete constrainttemplate k8srequiredprobes --ignore-not-found
 
           # Apply templates
           kubectl apply -f opa/templates/label-template.yaml

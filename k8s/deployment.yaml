@@ -4,13 +4,13 @@ metadata:
   name: flask-app
   labels:
     app: self-healing
-    owner: prasanna
+    # owner: prasanna
 spec:
   replicas: 2
   selector:
     matchLabels:
       app: self-healing
-      owner: prasanna
+      # owner: prasanna
   template:
     metadata:
       labels:
